@@ -289,11 +289,12 @@ function nextItem(){
     if (nxt !== undefined){ kStatus.shown++; kStatus.mseen = nxt+1; return {m:nxt}; }
   }
   kStatus.shown++;
-  // Leitner: niedrigste Stufe zuerst (Stufe 3 = sitzt), älteste Anfrage zuerst
+  // Leitner: niedrigste Stufe zuerst (Stufe 3 = sitzt), innerhalb der Stufe die am längsten nicht gefragte zuerst —
+  // frisch gefragte (Skip / Nochmal) rutschen damit ans ENDE der eigenen Stufe und kommen nicht sofort wieder
   let best = -1, score = 1e18;
   for (const i of pool){
     if (kStatus.lev[i] >= 3) continue;
-    const s = kStatus.lev[i]*1000 - kStatus.last[i];
+    const s = kStatus.lev[i]*1000 + kStatus.last[i];
     if (s < score){ score = s; best = i; }
   }
   if (best === -1){
@@ -311,9 +312,9 @@ function zeigeKarte(){
     const chipsG = ['Alle gemischt','Atemschutz','Branddienst','Funk','Kraftbetriebene Geräte','Technik','Taktik'];
     const chips = chipsG.map(g=>{
       const n = kartenPool(g).length, sitzg = kartenSitzen(g);
-      const sel = (g===kStatus.filter?'true':'false');
+      const sel = (g===kStatus.filter);
       const lbl = g==='Alle gemischt' ? 'Alle gemischt ('+n+')' : g+' · '+n+' Karten'+(sitzg>0?' · '+sitzg+' sitzen ✓':'');
-      return '<button class="pill" '+(sel?'style="border-color:var(--rot);font-weight:700" ':'')+'onclick="kSetFilter(\''+g.replace(/'/g,"\\'")+'\')">'+lbl+'</button>';
+      return '<button class="pill" '+(sel?'style="background:var(--rot);border-color:var(--rot);color:#fff;font-weight:800;box-shadow:0 3px 10px -4px rgba(220,38,38,.55)" ':'')+'onclick="kSetFilter(\''+g.replace(/'/g,"\\'")+'\')">'+lbl+'</button>';
     }).join('');
     sc.innerHTML = '<div class="karte"><div class="farbe">Lernkarten</div>'+
      '<div class="frage">Abfragen statt Lesen — das sitzt am besten.</div>'+
@@ -334,7 +335,7 @@ function zeigeKarte(){
   }
   kStatus.cur = it;
   const stufeTxt = (it.k === undefined) ? '' : ' · Stufe '+kStatus.lev[it.k]+'/3';
-  let h = '<div class="karte"><div class="minfo">'+(fA!=='Alle gemischt' ? fA+' · ':'')+fSitA+'/'+fTotA+' sitzen'+stufeTxt+'</div>';
+  let h = '<div class="karte"><div class="minfo">'+(fA!=='Alle gemischt' ? fA+' · ':'')+fSitA+'/'+fTotA+' sitzen · '+(fTotA-fSitA)+' offen'+stufeTxt+'</div>';
   if (it.m !== undefined){
     h += '<div class="farbe">Merk-hilfe · Auffrischer</div><div class="merkkachel" style="font-size:1em">'+MerkHtml(DATA.MERK[it.m])+'</div>'+
     '<button class="btn" onclick="karteEval(true)">Weiter</button><button class="btn zweit" onclick="karteEvalSkip()">Überspringen</button>';
