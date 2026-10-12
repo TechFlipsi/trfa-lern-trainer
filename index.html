@@ -63,6 +63,8 @@ h1 .tag{ display:inline-block; background:var(--rot); color:#fff; border-radius:
 .btn:focus-visible, .opt:focus-visible, .split button:focus-visible, .pill:focus-visible{ outline:2px solid var(--blau); outline-offset:2px; }
 .pill{ display:inline-block; padding:10px 14px; min-height:44px; background:var(--karte); color:var(--text); border:1px solid var(--linie); border-radius:99px; font-size:.9em; font-weight:700; cursor:pointer; transition:border-color .15s, color .15s; }
 .pill:hover{ border-color:var(--rot2); color:var(--rot2); }
+.pill.pillsel{ background:var(--rot); color:#fff; border-color:var(--rot); font-weight:800; box-shadow:0 3px 10px -4px rgba(220,38,38,.55); }
+.pill.pillsel:hover{ color:#fff; }
 .split{ display:flex; gap:10px; margin-top:12px; }
 .split button{ min-height:48px; flex:1; padding:12px; border:none; border-radius:var(--r-md); font-size:.95em; font-weight:800; cursor:pointer; transition:transform .1s; }
 .split button:active{ transform:scale(.98); }
@@ -314,7 +316,7 @@ function zeigeKarte(){
       const n = kartenPool(g).length, sitzg = kartenSitzen(g);
       const sel = (g===kStatus.filter);
       const lbl = g==='Alle gemischt' ? 'Alle gemischt ('+n+')' : g+' · '+n+' Karten'+(sitzg>0?' · '+sitzg+' sitzen ✓':'');
-      return '<button class="pill" '+(sel?'style="background:var(--rot);border-color:var(--rot);color:#fff;font-weight:800;box-shadow:0 3px 10px -4px rgba(220,38,38,.55)" ':'')+'onclick="kSetFilter(\''+g.replace(/'/g,"\\'")+'\')">'+lbl+'</button>';
+      return '<button class="pill'+(sel?' pillsel':'')+'" onclick="kSetFilter(\''+g.replace(/'/g,"\\'")+'\')">'+lbl+'</button>';
     }).join('');
     sc.innerHTML = '<div class="karte"><div class="farbe">Lernkarten</div>'+
      '<div class="frage">Abfragen statt Lesen — das sitzt am besten.</div>'+
